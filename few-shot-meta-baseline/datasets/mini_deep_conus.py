@@ -13,7 +13,7 @@ from .datasets import register
 @register('mini-deep-conus')
 class MiniDeepConus(Dataset):
     
-    def __init__(self, root_path, datasrc='../deep-conus-master/data/', split='train', **kwargs):
+    def __init__(self, root_path, datasrc='../deep-conus/data/', split='train', **kwargs):
         # TODO: make this a parameter
         #timestamp = '1666844475.2518342'
         timestamp = '1666997683.8305142'
