@@ -15,9 +15,9 @@ https://github.com/bertinetto/r2d2
 
 2. Open `deep-conus/fewshot.ipynb` as a Jupyter Notebook.
 
-3. Navigate to the cell that defines split_data_val(). Make any necessary revisions, e.g. to the filename. Some sections of the code might be block commented out; if so, un-comment those sections.
+3. Navigate to the cell that defines split_data_val(). Make any necessary revisions, e.g. to the filename. Set hyperparameters in the following cell.
 
-4. Run split_data_val() with your desired parameters. This should produce 3 `.pickle` files contianing data and 3 `.txt` files containing labels. Note that in order to maintain compatibility with the few-shot methods, the train, test, and validation splits **must have at least 5 classes each** and each class **must contain at least 20 samples.**
+4. Run split_data_val(). This should produce 3 `.pickle` files contianing data and 3 `.txt` files containing labels. Note that in order to maintain compatibility with the few-shot methods, the train, test, and validation splits **must have at least 5 classes each** and each class **must contain at least 20 samples.**
 
 5. Update the timestamp. Currently, this is hardcoded and should be changed in `/few-shot-meta-baseline/datasets/mini_deep_conus.py` and `/rfs/dataset/mini_deep_conus.py`.
 
