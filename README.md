@@ -1,30 +1,46 @@
-# Fewshot-Deep-Conus
-Recent few-shot learning methods adapted for atmospheric spatial data contained in the Deep Conus dataset
+# RFS
 
-# Running scripts
+Representations for Few-Shot Learning (RFS). This repo covers the implementation of the following paper:  
 
-## Few-shot-meta-baseline
+**"Rethinking few-shot image classification: a good embedding is all you need?"** [Paper](https://arxiv.org/abs/2003.11539),  [Project Page](https://people.csail.mit.edu/yuewang/projects/rfs/) 
 
-Navigate to `/few-shot-meta-baseline/`. Always run Classifier-Baseline before Meta-Baseline. Edit `/configs/test_few_shot.yaml` to evaluate with Classifier-Baseline instead of Meta-Baseline.
+If you find this repo useful for your research, please consider citing the paper  
+```
+@article{tian2020rethink,
+  title={Rethinking few-shot image classification: a good embedding is all you need?},
+  author={Tian, Yonglong and Wang, Yue and Krishnan, Dilip and Tenenbaum, Joshua B and Isola, Phillip},
+  journal={arXiv preprint arXiv:2003.11539},
+  year={2020}
+}
+```
 
-Train Classifier-Baseline: `python train_classifier.py --config configs/train_classifier_mini_dc.yaml`
+## Installation
 
-Train Meta-Baseline: `python train_meta.py --config configs/train_meta_mini_dc.yaml`
+This repo was tested with Ubuntu 16.04.5 LTS, Python 3.5, PyTorch 0.4.0, and CUDA 9.0. However, it should be compatible with recent PyTorch versions >=0.4.0
 
-Evaluate: `python test_few_shot.py --shot 1`; for n-shot learning, use `--shot n`
+## Download Data
+The data we used here is preprocessed by the repo of [MetaOptNet](https://github.com/kjunelee/MetaOptNet), but we have
+renamed the file. Our version of data can be downloaded from here:
 
-## Representations for Few-Shot Learning (RFS)
+[[DropBox]](https://www.dropbox.com/sh/6yd1ygtyc3yd981/AABVeEqzC08YQv4UZk7lNHvya?dl=0)
 
-Navigate to `/rfs-master/`. If you have enough memory or are using a cluster, set `--num_workers 8`.
+## Pre-trained Models
 
-Train: `python train_supervised.py --trial pretrain --num_workers 1 --data_root ../deep-conus-master/data/ --dataset miniDeepConus`
+[[DropBox]](https://www.dropbox.com/sh/6xt97e7yxheac2e/AADFVQDbzWap6qIGIHBXsA8ca?dl=0)
 
-Self-distillation: `python train_distillation.py -r 0.5 -a 0.5 --path_t ./models_pretrained/resnet12_miniDeepConus_lr_0.05_decay_0.0005_trans_A_trial_pretrain/resnet12_last.pth --trial born1 --num_workers 1 --data_root ../deep-conus-master/data/ --dataset miniDeepConus`
+## Running
 
-Evaluate: `python eval_fewshot.py --model_path ./models_distilled/S-resnet12_T-resnet12_miniDeepConus_kd_r-0.5_a-0.5_b-0_trans_A_born1/resnet12_last.pth --num_workers 1 --data_root ../deep-conus-master/data/ --dataset miniDeepConus`
+Exemplar commands for running the code can be found in `scripts/run.sh`.
 
-## Meta-learning with differentiable closed-form solvers
+For unuspervised learning methods `CMC` and `MoCo`, please refer to the [CMC](http://github.com/HobbitLong/CMC) repo.
 
-Not implemented; codebase is older and requires more effort to adapt.
+## Contacts
+For any questions, please contact:
 
-Once implemented, commands used will be similar to those found at `/r2d2-master/scripts/train/deep-conus.sh`.
+Yonglong Tian (yonglong@mit.edu)  
+Yue Wang (yuewang@csail.mit.edu)
+
+## Acknowlegements
+Part of the code for distillation is from [RepDistiller](http://github.com/HobbitLong/RepDistiller) repo.
+
+
