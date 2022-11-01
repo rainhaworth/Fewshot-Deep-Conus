@@ -1,0 +1,6 @@
+**/__pycache__
+/deep-conus/data
+/few-shot-meta-baseline/save
+/rfs/models_distilled
+/rfs/models_pretrained
+/rfs/tensorboard
