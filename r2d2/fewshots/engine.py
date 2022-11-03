@@ -40,13 +40,15 @@ class Engine(object):
                 self.hooks['on_sample'](state)
 
                 state['optimizer'].zero_grad()
+
+                # Moved this up here bc pytorch said to
+                state['optimizer'].step()
+
                 loss, state['output'] = state['model'].loss(state['sample'])
                 self.hooks['on_forward'](state)
 
                 loss.backward()
                 self.hooks['on_backward'](state)
-
-                state['optimizer'].step()
 
                 state['t'] += 1
                 state['batch'] += 1

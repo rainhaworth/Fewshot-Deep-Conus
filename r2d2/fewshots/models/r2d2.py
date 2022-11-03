@@ -31,9 +31,30 @@ class RRNet(nn.Module):
         self.linsys = linsys
 
     def loss(self, sample):
-        xs, xq = Variable(sample['xs']), Variable(sample['xq'])
+        # What are we even doing here? what are xs and xq?
+        # I really need ot figure out what the fuck xs and xq even are to get this to work
+        # I thought it was like, xs = data, xq = labels, but that's what i'm doing here and it's not working
+        # What else would it be though??
+
+        # I don't really see a way to fix this other than to read the paper so I'm gonna do that
+        # We're finding the loss between y_hat (eq 6) and y_outer
+        # We reorganize our parameters into a matrix W? But I guess we're finding that with the Woodbury formula
+            # W = \(Z) = X^T * (X*X^T + \I)^-1 * Y
+            # This is the ridge regression formula
+        # We have some labels for dimension sizes: o, e, p, and m. What are these?
+            # m -> x in R^m, size of input dims
+            # o -> y in R^o, size of output dims
+                # Are these supposed to be labels or features (i.e. for unsupervised learning)?
+            # e, p -> episode-specific predictor f(phi(x); w[epsilon]) : R^e x R^p -> R^o
+                # Maps input embeddings to outputs
+                # Parameterized by parameter set w[epsilon] in R^p, specific to episode epsilon
+        # So we're working in a single few-shot episode? And we do expect inputs = data, outputs = labels?
+
+        # maybe I can just,
+        xs, xq = Variable(sample[0]), Variable(sample[1])
+        #xs, xq = Variable(sample['xs']), Variable(sample['xq'])
         assert (xs.size(0) == xq.size(0))
-        n_way, n_shot, n_query = xs.size(0), xs.size(1), xq.size(1)
+        n_way, n_shot, n_query = xs.size(0), xs.size(1), xq.size(0) #xq.size(1) --> xq.size(0)
         if n_way * n_shot * self.n_augment > self.output_dim + 1:
             rr_type = 'standard'
             I = Variable(torch.eye(self.output_dim + 1).cuda())
@@ -102,7 +123,7 @@ class RRNet(nn.Module):
             A = mm(x, t_(x)) + self.lambda_rr(I)
             v = yrr_binary
             #w_, _ = gesv(v, A)
-            w = torch.linalg.solve(A, v)
+            w_ = torch.linalg.solve(A, v)
             w = mm(t_(x), w_)
 
         return w

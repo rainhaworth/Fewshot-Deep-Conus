@@ -99,8 +99,8 @@ def main(opts):
     if opts['data.cuda']:
         torch.cuda.manual_seed(opts['data.seed'])
 
-    # Erm what the heck x3
-    # Idk hopefully it works fine without these
+    # Idk what it means by val1 and val5 but I'm gonna just give both the val set for now
+    # Implemented that change in fewshots/data/load.py
     data = data_utils.load(opts, ['train', 'val1', 'val5'])
     train_loader = data['train']
     val1_loader = data['val1']

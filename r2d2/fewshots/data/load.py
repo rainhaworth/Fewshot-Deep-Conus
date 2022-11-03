@@ -11,6 +11,8 @@ from fewshots.data.cache import Cache
 from fewshots.utils import filter_opt
 from fewshots.data.SetupEpisode import SetupEpisode
 
+from fewshots.data.mini_deep_conus import MiniDeepConus
+
 root_dir = ''
 
 
@@ -70,49 +72,12 @@ def load_data(opt, splits):
         else:
             n_episodes = opt['data.train_episodes']
 
-        transforms = [partial(convert_dict, 'class'),
-                      partial(load_class_images, split, dataset, cache, augm_opt),
-                      partial(extract_episode, SE, augm_opt)]
-
-        if opt['data.cuda']:
-            transforms.append(CudaTransform())
-
-        transforms = compose(transforms)
-
-        #class_names = []
-        split_file = 'val.txt' if split in ['val1', 'val5'] else "{:s}.txt".format(split)
-        # Need to either change this to work with my dataset or change my dataset to work with this
-        # Okay new plan here, don't have the fortitude to implement this shit right now:
-            # Make mini_deep_conus.py, put it somewhere
-            # Import the dataset
-            # Just give that to ds, fuck this torchnet shit idk what the fuck is going on
-            # Also somehow need to keep track of labels i think?? whatever i'll figure it out
-        # Imported from mini_deep_conus.py:
-        timestamp = '1666844475.2518342'
-        labelfile = root_dir + '/'
-        
-        if split == 'train':
-            #datafile += 'src_data_' + timestamp + '.pickle'
-            labelfile += 'src_labels_' + timestamp + '.csv'
-            
-        elif split == 'test':
-            #datafile += 'tgt_data_' + timestamp + '.pickle'
-            labelfile += 'tgt_labels_' + timestamp + '.csv'
-            
-        elif split == 'val':
-            #datafile += 'val_data_' + timestamp + '.pickle'
-            labelfile += 'val_labels_' + timestamp + '.csv'
-            
-        else:
-            print("Split options: train, test, val")
-            return -1
-        
-        class_names = np.loadtxt(labelfile, delimiter=',')
-        
-        #with open(os.path.join(split_dir, split_file), 'r') as f:
-        #    for class_name in f.readlines():
-        #        class_names.append(class_name.rstrip('\n'))
-        ds = TransformDataset(ListDataset(class_names), transforms)
+        # Here's hoping this just works
+        # Change split name
+        splitname = split
+        if split in ['val1','val5']:
+            splitname = 'val'
+        ds = MiniDeepConus(root_dir + '/', split=splitname)
 
         sampler = EpisodicBatchSampler(SE, len(ds), n_episodes)
 

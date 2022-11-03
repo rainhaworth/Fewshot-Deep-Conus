@@ -83,7 +83,7 @@ def load_rrnet(**kwargs):
     if dataset == 'omniglot':
         x_dim = 1
     else:
-        x_dim = 3
+        x_dim = 23 #changing these hoping to fix something
 
     parameters = [96, 192, 384, 512]
     encoder = RRFeatures(x_dim, parameters, lrelu, drop, groupnorm, bn_momentum)
@@ -117,7 +117,7 @@ def load_rrnet_small(**kwargs):
     if dataset == 'omniglot':
         x_dim = 1
     else:
-        x_dim = 3
+        x_dim = 23
 
     parameters = [64, 64, 64, 64]
     encoder = RRFeatures(x_dim, parameters, lrelu, drop, groupnorm, bn_momentum)
