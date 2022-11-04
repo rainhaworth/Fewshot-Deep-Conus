@@ -15,6 +15,17 @@ from fewshots.data.mini_deep_conus import MiniDeepConus
 
 root_dir = ''
 
+# load_setup_images but for deep conus
+def load_deep_conus(cache, augm_opt, d):
+    cache_len = len(cache.data[d[1]])
+    # set arbitrary batch size
+    # for now the highest size i've seen is 48 so i'll just set it to 50
+    # now i actually get numbers!!!!!
+    # apparently these have to be the same size
+    batch_size = 24
+    rand_ids = np.random.choice(cache_len, size=batch_size)
+    out_dicts = [{'class': d[1], 'data': torch.cat([cache.data[d[1]][i] for i in rand_ids], dim=0)}]
+    return out_dicts
 
 def extract_episode(setup_episode, augm_opt, d):
     # data: N x C x H x W
@@ -22,11 +33,19 @@ def extract_episode(setup_episode, augm_opt, d):
 
     n_way, n_shot, n_query = setup_episode.get_current_setup()
 
+    # debug
+    #print(n_max_examples, n_way, n_shot, n_query)
+
+    # These 3 lines actually make no sense to me unless data.size(0) is large, i.e. not 1
+    # We're making a random list of indices up to n_max_examples
+    # Then we select support idx up to n_shot (0-4) and give the rest to query idx
+    # SO if n_max_examples < n_shot, query_inds will always be empty
     example_inds = torch.randperm(n_max_examples)[:(n_shot + n_query)]
 
     support_inds = example_inds[:n_shot]
     query_inds = example_inds[n_shot:]
 
+    #d[i]['data'][support_inds] 
     xs_list = [d[i]['data'][support_inds] for i in range(augm_opt['n_augment'])]
     # concatenate as shots into xs
     xs = torch.cat(xs_list, dim=0)
@@ -77,12 +96,48 @@ def load_data(opt, splits):
         splitname = split
         if split in ['val1','val5']:
             splitname = 'val'
+        #ds = MiniDeepConus(root_dir + '/', split=splitname)
+
+        
         ds = MiniDeepConus(root_dir + '/', split=splitname)
 
-        sampler = EpisodicBatchSampler(SE, len(ds), n_episodes)
+        cache.data.update({0: []})
+        # populate Cache
+        _loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False)
+        for sample in _loader:
+            if sample[1].item() not in cache.data.keys():
+                cache.data.update({sample[1].item(): []})
+            cache.data[sample[1].item()].append(sample[0])
+
+        # run this each time to set batch size, has to be the same every time
+        #print("min cache len:", min([len(cache.data[i]) for i in cache.data.keys()]))
+
+        # What if we just bring this back
+        transforms = [#partial(convert_dict, 'class'),
+                      #partial(load_class_images, split, dataset, cache, augm_opt),
+                      partial(load_deep_conus, cache, augm_opt), #added
+                      partial(extract_episode, SE, augm_opt)]
+
+        if opt['data.cuda']:
+            transforms.append(CudaTransform())
+
+        transforms = compose(transforms)
+
+        # Okay the format it wants is like, a dictionary
+        # But we don't really need to do that, just extract_episode
+
+        tds = TransformDataset(ds, transforms)
+        
+        # Wait a minute this sets n_classes to len(ds)??
+        # I guess it thinks ds is like, a list of tensors for each class?
+        # Changing to 11 to see what happens
+        # Apparently SE just contains (-1,-1,-1) right now
+        # Okay with 11 it thinks n_way = 11, we set it to 16 so that's not good
+        # I guess back to len(ds) it is, maybe try 25 later
+        sampler = EpisodicBatchSampler(SE, len(tds), n_episodes)
 
         # use num_workers=0, otherwise may receive duplicate episodes
-        ret[split] = torch.utils.data.DataLoader(ds, batch_sampler=sampler, num_workers=0)
+        ret[split] = torch.utils.data.DataLoader(tds, batch_sampler=sampler, num_workers=0)
 
     return ret
 

@@ -4,3 +4,4 @@
 /rfs/models_distilled
 /rfs/models_pretrained
 /rfs/tensorboard
+**/results/

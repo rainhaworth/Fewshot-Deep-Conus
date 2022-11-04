@@ -56,12 +56,12 @@ def _data_model_setup(opts):
     elif opts['data.dataset'] == 'minideepconus':
         # Mini Deep Conus implementation
         # Started w/ copy-pasted miniimagenet
-        opts['data.split'] = 'ravi-larochelle' # What is this?
+        opts['data.split'] = 'ravi-larochelle' # I guess this is just the split name, I don't use it
         opts['model.x_dim'] = '23,32,32' # Changed dims
         if opts['model.model_name'] == 'RRNet':
-            opts['model.out_dim'] = 31104 + 41472 # What the fuck is this number
+            opts['model.out_dim'] = 3456 + 4608 # Same as cifar100 bc this is also 32 * 32
         elif opts['model.model_name'] == 'RRNet_small':
-            opts['model.out_dim'] = 5184 * 2
+            opts['model.out_dim'] = 576 * 2
         else:
             raise ValueError('Unknown model name')
     else:
@@ -140,6 +140,7 @@ def main(opts):
             for field, meter in split_meters.items():
                 meter.reset()
         if opts['train.scheduler_type'] == 'step':
+            state['optimizer'].step() # Added to make PyTorch happy
             state['scheduler'].step()
 
     engine.hooks['on_start_epoch'] = on_start_epoch

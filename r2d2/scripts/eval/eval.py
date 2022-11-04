@@ -8,6 +8,10 @@ import math
 import torch
 import torchnet as tnt
 
+# same fix from train.py
+import sys
+sys.path.insert(1, '../..')
+
 from fewshots.utils import filter_opt, merge_dict
 import fewshots.utils.data as data_utils
 import fewshots.utils.model as model_utils
