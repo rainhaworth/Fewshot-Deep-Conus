@@ -14,8 +14,7 @@ class MiniDeepConus(Dataset):
     
     def __init__(self, root_path, split='train', **kwargs):
         # TODO: make this a parameter
-        timestamp = '1666844475.2518342'
-        #timestamp = '1666997683.8305142'
+        timestamp = '1668196919.8680186'
         
         datafile = root_path
         labelfile = root_path
@@ -37,18 +36,31 @@ class MiniDeepConus(Dataset):
             print("Split options: train, test, val")
             return -1
         
-        self.label = np.loadtxt(labelfile, delimiter=',')
+        with open(labelfile, 'rb') as f:
+            self.label = np.loadtxt(f, delimiter=',')
         self.label = self.label.astype(np.int64) # Convert to long
         
         self.n_classes = len(set(self.label))
         
+        # Still need this
         label_lst = list(set(self.label))
         self.label = [label_lst.index(label) for label in self.label]
         
         # Unpickle data, store in self.data
-        pickle_in = open(datafile, 'rb')
-        self.data = pickle.load(pickle_in)
-        
+        self.data = None
+        with open(datafile, 'rb') as f:
+            _arr = []
+            while True:
+                try:
+                    _arr = pickle.load(f)
+                except EOFError:
+                    break
+                else:
+                    if self.data is None:
+                        self.data = _arr
+                    else:
+                        self.data = np.concatenate((self.data, _arr), axis=0)
+
         # Transforms
         # Normalization (params generated in deep-conus-master/fewshot.ipynb)
         norm_params = {'mean': [280.8821716308594, 271.5213928222656, 260.1457214355469, 246.7049102783203, 8.42071533203125, 13.114259719848633, 16.928213119506836, 19.719449996948242, 6.177618026733398, 13.898662567138672, 18.913000106811523, 23.985916137695312, 0.007207642309367657, 0.0046530915424227715, 0.002190731931477785, 0.0007718075066804886, 868.15625, 678.8226928710938, 525.4044799804688, 401.36004638671875, 0.40490102767944336, 23.232492446899414, 8.562521934509277],

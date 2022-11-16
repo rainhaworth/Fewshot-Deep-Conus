@@ -1,6 +1,6 @@
-import os
+#import os
 import pickle
-from PIL import Image
+#from PIL import Image
 import numpy as np
 import torch
 from torch.utils.data import Dataset
@@ -16,7 +16,6 @@ class DeepConus(Dataset):
         self.partition = partition
         self.data_aug = args.data_aug
         # Maybe I should handle these differently lol
-        # Do we need to convert_raw?
         self.mean = [280.8821716308594, 271.5213928222656, 260.1457214355469, 246.7049102783203, 8.42071533203125, 13.114259719848633, 16.928213119506836, 19.719449996948242, 6.177618026733398, 13.898662567138672, 18.913000106811523, 23.985916137695312, 0.007207642309367657, 0.0046530915424227715, 0.002190731931477785, 0.0007718075066804886, 868.15625, 678.8226928710938, 525.4044799804688, 401.36004638671875, 0.40490102767944336, 23.232492446899414, 8.562521934509277]
         self.std = [109.22666931152344, 109.22666931152344, 77.23491668701172, 109.22666931152344, 8.866754531860352, 9.56382942199707, 10.957494735717773, 11.892759323120117, 8.308595657348633, 9.732820510864258, 11.696307182312012, 14.249922752380371, 0.004077681340277195, 0.0025500282645225525, 0.0013640702236443758, 0.0005331166321411729, 309.60260009765625, 308.9396667480469, 195.89791870117188, 154.46983337402344, 0.48534637689590454, 15.682641983032227, 6.017237186431885]
         self.normalize = transforms.Normalize(mean=self.mean, std=self.std)
@@ -27,7 +26,7 @@ class DeepConus(Dataset):
         # Notes on args:
             # We probably have to keep is_sample = false, which means --n_aug_support_samples 0 for meta learning
 
-        timestamp = '1666844475.2518342'
+        timestamp = '1668196919.8680186'
         
         datafile = self.data_root
         labelfile = self.data_root
@@ -49,7 +48,8 @@ class DeepConus(Dataset):
             return -1
         
         # Store list of labels + number of classes contained within it
-        self.labels = np.loadtxt(labelfile, delimiter=',')
+        with open(labelfile, 'rb') as f:
+            self.labels = np.loadtxt(f, delimiter=',')
         self.labels = self.labels.astype(np.int64) # Convert to long
         
         self.n_classes = len(set(self.labels))
@@ -57,76 +57,32 @@ class DeepConus(Dataset):
         # Cross entropy doesn't work unless each label is in the range [0,n_classes]
         label_lst = list(set(self.labels))
         self.labels = [label_lst.index(label) for label in self.labels]
-        
-        # Unpickle data, store in self.imgs
-        pickle_in = open(datafile, 'rb')
-        self.data = pickle.load(pickle_in)
+
+        # Unpickle data, store in self.data + self.imgs
+        self.data = None
+        with open(datafile, 'rb') as f:
+            _arr = []
+            while True:
+                try:
+                    _arr = pickle.load(f)
+                except EOFError:
+                    break
+                else:
+                    if self.data is None:
+                        self.data = _arr
+                    else:
+                        self.data = np.concatenate((self.data, _arr), axis=0)
         self.imgs = self.data
-        
-        # idk what pretrain means, or any of the rest of this for that matter
-        # just commenting everything out for now
-        """
-        if self.pretrain:
-            self.file_pattern = 'miniImageNet_category_split_train_phase_%s.pickle'           
-        else:
-            self.file_pattern = 'miniImageNet_category_split_%s.pickle' 
-        
-        #self.data = {}
-        with open(os.path.join(self.data_root, self.file_pattern % partition), 'rb') as f:
-            data = pickle.load(f, encoding='latin1')
-            self.imgs = data['data']
-            self.labels = data['labels']
-
-        # pre-process for contrastive sampling
-        # that comment^ is from them, idk what any of this means but i doubt it helps with non-images
-        self.k = k
-        self.is_sample = is_sample
-        if self.is_sample:
-            self.labels = np.asarray(self.labels)
-            self.labels = self.labels - np.min(self.labels)
-            num_classes = np.max(self.labels) + 1
-
-            self.cls_positive = [[] for _ in range(num_classes)]
-            for i in range(len(self.imgs)):
-                self.cls_positive[self.labels[i]].append(i)
-
-            self.cls_negative = [[] for _ in range(num_classes)]
-            for i in range(num_classes):
-                for j in range(num_classes):
-                    if j == i:
-                        continue
-                    self.cls_negative[i].extend(self.cls_positive[j])
-
-            self.cls_positive = [np.asarray(self.cls_positive[i]) for i in range(num_classes)]
-            self.cls_negative = [np.asarray(self.cls_negative[i]) for i in range(num_classes)]
-            self.cls_positive = np.asarray(self.cls_positive)
-            self.cls_negative = np.asarray(self.cls_negative)
-            """
 
     def __getitem__(self, item):
         # For some reason we need to return the index they passed in
         return self.transform(self.data[item]), self.labels[item], item
         
-        # once again not really sure what's going on, commenting out
-        """
-        img = np.asarray(self.imgs[item]).astype('uint8')
-        img = self.transform(img)
-        target = self.labels[item] - min(self.labels)
-
-        if not self.is_sample:
-            return img, target, item
-        else:
-            pos_idx = item
-            replace = True if self.k > len(self.cls_negative[target]) else False
-            neg_idx = np.random.choice(self.cls_negative[target], self.k, replace=replace)
-            sample_idx = np.hstack((np.asarray([pos_idx]), neg_idx))
-            return img, target, item, sample_idx
-            """
-        
     def __len__(self):
         return len(self.labels)
 
-
+# This is only used for testing
+# I guess it's basically just a fewshot episode generator
 class MetaDeepConus(DeepConus):
     
     def __init__(self, args, partition='train', train_transform=None, test_transform=None, fix_seed=True):
@@ -232,7 +188,3 @@ if __name__ == '__main__':
     
     metadeepconus = MetaDeepConus(args)
     print(len(metadeepconus))
-    print(metaimagenet.__getitem__(500)[0].size())
-    print(metaimagenet.__getitem__(500)[1].shape)
-    print(metaimagenet.__getitem__(500)[2].size())
-    print(metaimagenet.__getitem__(500)[3].shape)

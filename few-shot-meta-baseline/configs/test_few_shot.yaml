@@ -1,5 +1,5 @@
 dataset: mini-deep-conus
-dataset_args: {split: test}
+dataset_args: {split: test, root_path: ../deep-conus/data/}
 
 load: ./save/meta_mini-deep-conus-1shot_meta-baseline-resnet12/max-va.pth
 

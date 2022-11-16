@@ -16,13 +16,8 @@ from fewshots.data.mini_deep_conus import MiniDeepConus
 root_dir = ''
 
 # load_setup_images but for deep conus
-def load_deep_conus(cache, augm_opt, d):
+def load_deep_conus(cache, batch_size, augm_opt, d):
     cache_len = len(cache.data[d[1]])
-    # set arbitrary batch size
-    # for now the highest size i've seen is 48 so i'll just set it to 50
-    # now i actually get numbers!!!!!
-    # apparently these have to be the same size
-    batch_size = 24
     rand_ids = np.random.choice(cache_len, size=batch_size)
     out_dicts = [{'class': d[1], 'data': torch.cat([cache.data[d[1]][i] for i in rand_ids], dim=0)}]
     return out_dicts
@@ -32,20 +27,12 @@ def extract_episode(setup_episode, augm_opt, d):
     n_max_examples = d[0]['data'].size(0)
 
     n_way, n_shot, n_query = setup_episode.get_current_setup()
-
-    # debug
-    #print(n_max_examples, n_way, n_shot, n_query)
-
-    # These 3 lines actually make no sense to me unless data.size(0) is large, i.e. not 1
-    # We're making a random list of indices up to n_max_examples
-    # Then we select support idx up to n_shot (0-4) and give the rest to query idx
-    # SO if n_max_examples < n_shot, query_inds will always be empty
+    
     example_inds = torch.randperm(n_max_examples)[:(n_shot + n_query)]
 
     support_inds = example_inds[:n_shot]
     query_inds = example_inds[n_shot:]
 
-    #d[i]['data'][support_inds] 
     xs_list = [d[i]['data'][support_inds] for i in range(augm_opt['n_augment'])]
     # concatenate as shots into xs
     xs = torch.cat(xs_list, dim=0)
@@ -109,13 +96,16 @@ def load_data(opt, splits):
                 cache.data.update({sample[1].item(): []})
             cache.data[sample[1].item()].append(sample[0])
 
-        # run this each time to set batch size, has to be the same every time
-        #print("min cache len:", min([len(cache.data[i]) for i in cache.data.keys()]))
+        # set batch size to minimum cache length
+        batch_sz = min([len(cache.data[i]) for i in cache.data.keys()])
+
+        # set max batch size
+        batch_sz = min(200, batch_sz)
 
         # What if we just bring this back
         transforms = [#partial(convert_dict, 'class'),
                       #partial(load_class_images, split, dataset, cache, augm_opt),
-                      partial(load_deep_conus, cache, augm_opt), #added
+                      partial(load_deep_conus, cache, batch_sz, augm_opt), #added
                       partial(extract_episode, SE, augm_opt)]
 
         if opt['data.cuda']:

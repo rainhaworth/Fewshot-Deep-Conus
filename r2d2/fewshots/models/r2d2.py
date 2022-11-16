@@ -99,16 +99,22 @@ class RRNet(nn.Module):
             rr_type = 'woodbury'
             I = Variable(torch.eye(n_way * n_shot * self.n_augment).cuda())
 
+        # I think this isn't really doing anything other than intializing data structures
+        # so basically y_outer_binary is full of 1s, y_inner is full of 1/(sqrt nway*nshot*naug)
+        # and y_outer is long labels, idk exactly what it looks like
         y_inner = make_float_label(n_way, n_shot * self.n_augment) / np.sqrt(n_way * n_shot * self.n_augment)
         y_outer_binary = make_float_label(n_way, n_query)
         y_outer = make_long_label(n_way, n_query)
 
+        # Concatenate xs and xq
         x = torch.cat([xs.view(n_way * n_shot * self.n_augment, *xs.size()[2:]),
                        xq.view(n_way * n_query, *xq.size()[2:])], 0)
 
+        # I guess this is basically setting x, y_outer_binary, and y_outer to a random few-shot episode
         x, y_outer_binary, y_outer = shuffle_queries_multi(x, n_way, n_shot, n_query, self.n_augment, y_outer_binary,
                                                            y_outer)
-
+        
+        # z = call encoder.forward() on x, then break back into support and query
         z = self.encoder.forward(x)
         zs = z[:n_way * n_shot * self.n_augment]
         zq = z[n_way * n_shot * self.n_augment:]

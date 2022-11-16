@@ -85,7 +85,7 @@ def parse_option():
                         help='Number of shots in test')
     parser.add_argument('--n_queries', type=int, default=15, metavar='N',
                         help='Number of query in test')
-    parser.add_argument('--n_aug_support_samples', default=5, type=int,
+    parser.add_argument('--n_aug_support_samples', default=1, type=int,
                         help='The number of augmented samples for each meta test sample')
     parser.add_argument('--test_batch_size', type=int, default=1, metavar='test_batch_size',
                         help='Size of test batch)')
@@ -235,6 +235,9 @@ def main():
         val_loader = DataLoader(DeepConus(args=opt, partition='val', transform=test_trans),
                                 batch_size=opt.batch_size // 2, shuffle=False, drop_last=False,
                                 num_workers=opt.num_workers // 2)
+        # I just noticed these aren't actually used at all, I guess they were imported from some other codebase
+        # Commenting out for now; see if anything breaks
+        """
         meta_testloader = DataLoader(MetaDeepConus(args=opt, partition='test',
                                                   train_transform=train_trans,
                                                   test_transform=test_trans),
@@ -245,6 +248,7 @@ def main():
                                                  test_transform=test_trans),
                                     batch_size=opt.test_batch_size, shuffle=False, drop_last=False,
                                     num_workers=opt.num_workers)
+                                    """
         n_cls = 11 # I guess just hardcode this for now
     else:
         raise NotImplementedError(opt.dataset)

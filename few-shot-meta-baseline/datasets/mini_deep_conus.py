@@ -1,6 +1,6 @@
-import math
+#import math
 import pickle
-import os
+#import os
 import numpy as np
 #import xarray as xr
 
@@ -13,13 +13,12 @@ from .datasets import register
 @register('mini-deep-conus')
 class MiniDeepConus(Dataset):
     
-    def __init__(self, root_path, datasrc='../deep-conus/data/', split='train', **kwargs):
+    def __init__(self, root_path, split='train', **kwargs):
         # TODO: make this a parameter
-        #timestamp = '1666844475.2518342'
-        timestamp = '1666997683.8305142'
+        timestamp = '1668196919.8680186'
         
-        datafile = datasrc
-        labelfile = datasrc
+        datafile = root_path
+        labelfile = root_path
         
         if split == 'train':
             datafile += 'src_data_' + timestamp + '.pickle'
@@ -39,7 +38,8 @@ class MiniDeepConus(Dataset):
             return -1
         
         # Store list of labels + number of classes contained within it
-        self.label = np.loadtxt(labelfile, delimiter=',')
+        with open(labelfile, 'rb') as f:
+            self.label = np.loadtxt(f, delimiter=',')
         self.label = self.label.astype(np.int64) # Convert to long
         
         
@@ -53,8 +53,19 @@ class MiniDeepConus(Dataset):
         self.label = [label_lst.index(label) for label in self.label]
         
         # Unpickle data, store in self.data
-        pickle_in = open(datafile, 'rb')
-        self.data = pickle.load(pickle_in)
+        self.data = None
+        with open(datafile, 'rb') as f:
+            _arr = []
+            while True:
+                try:
+                    _arr = pickle.load(f)
+                except EOFError:
+                    break
+                else:
+                    if self.data is None:
+                        self.data = _arr
+                    else:
+                        self.data = np.concatenate((self.data, _arr), axis=0)
         
         # Transforms
         # Normalization (params generated in deep-conus-master/fewshot.ipynb)

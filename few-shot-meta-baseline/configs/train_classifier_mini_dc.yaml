@@ -1,7 +1,7 @@
 train_dataset: mini-deep-conus
-train_dataset_args: {split: train}
+train_dataset_args: {split: train, root_path: ../deep-conus/data/}
 fs_dataset: mini-deep-conus
-fs_dataset_args: {split: test}
+fs_dataset_args: {split: test, root_path: ../deep-conus/data/}
 eval_fs_epoch: 5
 
 model: classifier

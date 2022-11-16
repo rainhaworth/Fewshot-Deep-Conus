@@ -48,7 +48,7 @@ def parse_option():
                         help='Number of shots in test')
     parser.add_argument('--n_queries', type=int, default=15, metavar='N',
                         help='Number of query in test')
-    parser.add_argument('--n_aug_support_samples', default=5, type=int,
+    parser.add_argument('--n_aug_support_samples', default=1, type=int,
                         help='The number of augmented samples for each meta test sample')
     parser.add_argument('--data_root', type=str, default='data', metavar='N',
                         help='Root dataset')
