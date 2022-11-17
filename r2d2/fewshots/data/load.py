@@ -78,18 +78,15 @@ def load_data(opt, splits):
         else:
             n_episodes = opt['data.train_episodes']
 
-        # Here's hoping this just works
         # Change split name
         splitname = split
         if split in ['val1','val5']:
             splitname = 'val'
-        #ds = MiniDeepConus(root_dir + '/', split=splitname)
-
         
         ds = MiniDeepConus(root_dir + '/', split=splitname)
 
-        cache.data.update({0: []})
         # populate Cache
+        cache.data.update({0: []})
         _loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False)
         for sample in _loader:
             if sample[1].item() not in cache.data.keys():
@@ -97,12 +94,13 @@ def load_data(opt, splits):
             cache.data[sample[1].item()].append(sample[0])
 
         # set batch size to minimum cache length
+        # if this causes issues, set it manually
         batch_sz = min([len(cache.data[i]) for i in cache.data.keys()])
 
         # set max batch size
         batch_sz = min(200, batch_sz)
 
-        # What if we just bring this back
+        # set transforms
         transforms = [#partial(convert_dict, 'class'),
                       #partial(load_class_images, split, dataset, cache, augm_opt),
                       partial(load_deep_conus, cache, batch_sz, augm_opt), #added
@@ -113,17 +111,8 @@ def load_data(opt, splits):
 
         transforms = compose(transforms)
 
-        # Okay the format it wants is like, a dictionary
-        # But we don't really need to do that, just extract_episode
-
         tds = TransformDataset(ds, transforms)
         
-        # Wait a minute this sets n_classes to len(ds)??
-        # I guess it thinks ds is like, a list of tensors for each class?
-        # Changing to 11 to see what happens
-        # Apparently SE just contains (-1,-1,-1) right now
-        # Okay with 11 it thinks n_way = 11, we set it to 16 so that's not good
-        # I guess back to len(ds) it is, maybe try 25 later
         sampler = EpisodicBatchSampler(SE, len(tds), n_episodes)
 
         # use num_workers=0, otherwise may receive duplicate episodes

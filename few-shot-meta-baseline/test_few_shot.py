@@ -30,8 +30,10 @@ def main(config):
     dataset = datasets.make(config['dataset'], **config['dataset_args'])
     utils.log('dataset: {} (x{}), {}'.format(
             dataset[0][0].shape, len(dataset), dataset.n_classes))
+    # NOTE: to change n_way or n_query, you have to hardcode it here
+    # It would probably be best if that weren't the case
     if not args.sauc:
-        n_way = 5 # Changed 5->9
+        n_way = 5
     else:
         n_way = 2
     n_shot, n_query = args.shot, 15
@@ -74,8 +76,6 @@ def main(config):
 
             with torch.no_grad():
                 if not args.sauc:
-                    # I wanna check what's going on here
-                    # I guess I'll just print everything that doesn't get printed
                     logits = model(x_shot, x_query).view(-1, n_way)
                     label = fs.make_nk_label(n_way, n_query,
                             ep_per_batch=ep_per_batch).cuda()

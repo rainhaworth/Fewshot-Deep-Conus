@@ -275,6 +275,7 @@ def main():
         val_loader = DataLoader(DeepConus(args=opt, partition='val', transform=test_trans),
                                 batch_size=opt.batch_size // 2, shuffle=False, drop_last=False,
                                 num_workers=opt.num_workers // 2)
+        """
         meta_testloader = DataLoader(MetaDeepConus(args=opt, partition='test',
                                                   train_transform=train_trans,
                                                   test_transform=test_trans),
@@ -285,6 +286,7 @@ def main():
                                                  test_transform=test_trans),
                                     batch_size=opt.test_batch_size, shuffle=False, drop_last=False,
                                     num_workers=opt.num_workers)
+                                    """
         # Hardcode n_cls again
         n_cls = 11
     else:

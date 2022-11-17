@@ -219,11 +219,9 @@ def main():
             else:
                 raise NotImplementedError('dataset not supported: {}'.format(opt.dataset))
     elif opt.dataset == 'miniDeepConus':
-        # All I did was copy paste miniImageNet and change names to DeepConus
-        # Something is definitely wrong somewhere bc my accuracy is genuinely terrible and gets worse with more training
-        # Notes:
-            # This is using tranform A from dataset/config_cfg.py
-            # It probably should not be doing that; modify transform A
+        # This model really is not working well
+        # Notes/troubleshooting:
+            # This would use tranform A from dataset/config_cfg.py but ignores it
             # Using val is fine
             # What is drop_last doing?
             # I'm guessing MetaDeepConus is causing issues and/or the transform is causing issues
@@ -235,8 +233,8 @@ def main():
         val_loader = DataLoader(DeepConus(args=opt, partition='val', transform=test_trans),
                                 batch_size=opt.batch_size // 2, shuffle=False, drop_last=False,
                                 num_workers=opt.num_workers // 2)
-        # I just noticed these aren't actually used at all, I guess they were imported from some other codebase
-        # Commenting out for now; see if anything breaks
+        # I just noticed these aren't actually used at all in this
+        # Commenting out for now
         """
         meta_testloader = DataLoader(MetaDeepConus(args=opt, partition='test',
                                                   train_transform=train_trans,
@@ -249,7 +247,8 @@ def main():
                                     batch_size=opt.test_batch_size, shuffle=False, drop_last=False,
                                     num_workers=opt.num_workers)
                                     """
-        n_cls = 11 # I guess just hardcode this for now
+        # They just hardcoded the number of classes; make sure you change this as needed
+        n_cls = 11
     else:
         raise NotImplementedError(opt.dataset)
 

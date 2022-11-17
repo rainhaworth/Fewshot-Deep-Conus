@@ -153,7 +153,7 @@ class ResNet(nn.Module):
                  dropblock_size=5, num_classes=-1, use_se=False):
         super(ResNet, self).__init__()
 
-        self.inplanes = 23 # Assuming this needs to be changed to 23 again
+        self.inplanes = 23 # 3 --> 23
         self.use_se = use_se
         self.layer1 = self._make_layer(block, n_blocks[0], 64,
                                        stride=2, drop_rate=drop_rate)

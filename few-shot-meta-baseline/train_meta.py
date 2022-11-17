@@ -34,7 +34,9 @@ def main(config):
 
     #### Dataset ####
     
-    # Changed num_workers=8 --> num_workers=1 again so it runs locally
+    # Another global num_workers setting
+    # Might be best to add a parameter/config for this
+    nw = 8
 
     n_way, n_shot = config['n_way'], config['n_shot']
     n_query = config['n_query']
@@ -65,7 +67,7 @@ def main(config):
             n_train_way, n_train_shot + n_query,
             ep_per_batch=ep_per_batch)
     train_loader = DataLoader(train_dataset, batch_sampler=train_sampler,
-                              num_workers=1, pin_memory=True)
+                              num_workers=nw, pin_memory=True)
 
     # tval
     if config.get('tval_dataset'):
@@ -81,7 +83,7 @@ def main(config):
                 n_way, n_shot + n_query,
                 ep_per_batch=4)
         tval_loader = DataLoader(tval_dataset, batch_sampler=tval_sampler,
-                                 num_workers=1, pin_memory=True)
+                                 num_workers=nw, pin_memory=True)
     else:
         tval_loader = None
 
@@ -98,7 +100,7 @@ def main(config):
             n_way, n_shot + n_query,
             ep_per_batch=4)
     val_loader = DataLoader(val_dataset, batch_sampler=val_sampler,
-                            num_workers=1, pin_memory=True)
+                            num_workers=nw, pin_memory=True)
 
     ########
 

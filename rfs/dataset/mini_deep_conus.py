@@ -132,8 +132,8 @@ class MetaDeepConus(DeepConus):
         self.classes = list(self.data.keys())
 
     def __getitem__(self, item):
-        # I'm cautiously optimistic that this part will Just Work
-        # Might need to shuffle around axes?
+        # I'm not 100% sure what this part of the code does
+        # Seemingly we're just constructing few-shot episodes
         if self.fix_seed:
             np.random.seed(item)
         cls_sampled = np.random.choice(self.classes, self.n_ways, False)

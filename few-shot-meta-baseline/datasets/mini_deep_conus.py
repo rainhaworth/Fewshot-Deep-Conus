@@ -16,7 +16,7 @@ class MiniDeepConus(Dataset):
     def __init__(self, root_path, split='train', **kwargs):
         # TODO: make this a parameter
         timestamp = '1668196919.8680186'
-        
+
         datafile = root_path
         labelfile = root_path
         
@@ -44,11 +44,9 @@ class MiniDeepConus(Dataset):
         
         
         # Trying using n_classes = max label instead of this
-        #self.n_classes = max(self.label) + 1
         self.n_classes = len(set(self.label))
         
         # Cross entropy doesn't work unless each label is in the range [0,n_classes]
-        # So to achieve that, we have to do this (hopefully it won't cause weird issues)
         label_lst = list(set(self.label))
         self.label = [label_lst.index(label) for label in self.label]
         
