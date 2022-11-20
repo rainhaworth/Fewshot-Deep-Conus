@@ -17,6 +17,11 @@ def decompose_nc(datasrc='./data/', filestr='spatial_storm_data_part', outdir='.
     # Populate array with max uh25 values
     uh25_max_arr = []
 
+    # If we have stored some values already, retrieve them
+    if os.path.isfile(outdir + 'uh25max.csv'):
+        with open(outdir + 'uh25max.csv','rb') as f:
+            uh25_max_arr = np.loadtxt(f, uh25_max_arr, delimiter=',')
+
     # Traverse all files
     while os.path.isfile(datasrc + filestr + str(filenum) + '.nc'):
         ds = xr.open_dataset(datasrc + filestr + str(filenum) + '.nc')

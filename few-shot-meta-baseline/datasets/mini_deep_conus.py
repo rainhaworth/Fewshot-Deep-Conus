@@ -80,5 +80,5 @@ class MiniDeepConus(Dataset):
 
     def __getitem__(self, idx):
         # Open patch file
-        with open(self.root_path + 'patch_' + str(self.data[idx]) + '.csv','rb') as f:
+        with open(self.root_path + 'patch_' + str(self.data[idx]) + '.pickle','rb') as f:
             return self.transform(pickle.load(f)), self.label[idx]

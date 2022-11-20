@@ -38,7 +38,7 @@ def main(config):
     
     # Reduce num_workers if you have memory issues
     # Added a global setting for it here
-    nw = 8
+    nw = 4
 
     # train
     train_dataset = datasets.make(config['train_dataset'],
@@ -90,7 +90,7 @@ def main(config):
                     fs_dataset.label, 200,
                     n_way, n_shot + n_query, ep_per_batch=4)
             fs_loader = DataLoader(fs_dataset, batch_sampler=fs_sampler,
-                                   num_workers=nw, pin_memory=True)
+                                   num_workers=nw, pin_memory=False)
             fs_loaders.append(fs_loader)
     else:
         eval_fs = False

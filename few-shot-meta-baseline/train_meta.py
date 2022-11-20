@@ -36,7 +36,7 @@ def main(config):
     
     # Another global num_workers setting
     # Might be best to add a parameter/config for this
-    nw = 8
+    nw = 4
 
     n_way, n_shot = config['n_way'], config['n_shot']
     n_query = config['n_query']
