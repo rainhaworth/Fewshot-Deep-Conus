@@ -31,7 +31,7 @@ class MiniDeepConus(Dataset):
         
         # Store list of labels + number of classes contained within it
         with open(splitfile, 'rb') as f:
-            _dict = np.loadtxt(f, delimiter=',')
+            _dict = pickle.load(f)
             self.label = list(_dict.values())
             self.data = list(_dict.keys())
         
