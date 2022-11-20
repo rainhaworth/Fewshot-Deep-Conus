@@ -82,6 +82,7 @@ def split_data_val_decomp(datasrc='./data/', filestr='uh25max', outdir='./data',
             # If calculated class exceeds number of classes, put in highest class
             if val_class >= n_class:
                 val_class = n_class - 1
+                print(val) # Print value to see how far it is above max_val
 
             # Remove the bottom (separation*100)% of data within this class
             # Note: a consequence of this is that all very light storms are pruned

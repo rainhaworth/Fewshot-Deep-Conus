@@ -12,7 +12,7 @@ def decompose_nc(datasrc='./data/', filestr='spatial_storm_data_part', outdir='.
 
     # Track patch index across files
     filenum = start
-    idx = 0
+    idx = (1-start) * 90000 # NOTE: This assumes every file up to start has exactly 90k patches
 
     # Populate array with max uh25 values
     uh25_max_arr = []
@@ -28,6 +28,8 @@ def decompose_nc(datasrc='./data/', filestr='spatial_storm_data_part', outdir='.
         ds = ds.drop_vars('uh25')
         data_array_list = [ds[key] for key in list(ds)]
 
+        # NOTE: it wouldn't be hard to achieve performance gains w/ parallelism here
+        # Currently this takes around 15 minutes per file (90k patches)
         for j in tqdm(range(len(uh25mx)), desc=('File ' + str(filenum))):
             # if it hasn't been created yet, create a new 23x32x32 tensor, serialize, and write to disk
             if not os.path.isfile(outdir + 'patch_' + str(idx) + '.pickle'):
