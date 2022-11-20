@@ -1,12 +1,10 @@
-#import math
 import pickle
-#import os
 import numpy as np
 #import xarray as xr
 
 import torch
 from torch.utils.data import Dataset
-from torchvision import transforms # Only used to transform to tensor
+from torchvision import transforms, ops
 
 from .datasets import register
 
@@ -15,7 +13,7 @@ class MiniDeepConus(Dataset):
     
     def __init__(self, root_path, split='train', **kwargs):
         # TODO: make this a parameter
-        timestamp = '1668196919.8680186'
+        timestamp = '1668967699.7431824'
 
         splitfile = root_path
         self.root_path = root_path
@@ -36,8 +34,6 @@ class MiniDeepConus(Dataset):
             _dict = np.loadtxt(f, delimiter=',')
             self.label = list(_dict.values())
             self.data = list(_dict.keys())
-        self.label = self.label.astype(np.int64) # Convert to long
-        
         
         # Trying using n_classes = max label instead of this
         self.n_classes = len(set(self.label))
@@ -68,7 +64,7 @@ class MiniDeepConus(Dataset):
                        'std': [109.22666931152344, 109.22666931152344, 77.23491668701172, 109.22666931152344, 8.866754531860352, 9.56382942199707, 10.957494735717773, 11.892759323120117, 8.308595657348633, 9.732820510864258, 11.696307182312012, 14.249922752380371, 0.004077681340277195, 0.0025500282645225525, 0.0013640702236443758, 0.0005331166321411729, 309.60260009765625, 308.9396667480469, 195.89791870117188, 154.46983337402344, 0.48534637689590454, 15.682641983032227, 6.017237186431885]}
         normalize = transforms.Normalize(**norm_params)
         
-        self.default_transform = transforms.Compose([transforms.ToTensor(), normalize])
+        self.default_transform = transforms.Compose([transforms.ToTensor(), ops.Permute([1,2,0]), normalize])
         self.transform = self.default_transform
         
         # Convert from normalized to raw
@@ -84,5 +80,5 @@ class MiniDeepConus(Dataset):
 
     def __getitem__(self, idx):
         # Open patch file
-        with open(self.root_path + 'patch_' + str(idx) + '.csv','rb') as f:
+        with open(self.root_path + 'patch_' + str(self.data[idx]) + '.csv','rb') as f:
             return self.transform(pickle.load(f)), self.label[idx]
