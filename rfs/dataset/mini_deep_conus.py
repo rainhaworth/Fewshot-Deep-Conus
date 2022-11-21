@@ -125,12 +125,14 @@ class MetaDeepConus(DeepConus):
         self.train_transform = transforms.ToTensor()
         self.test_transform = transforms.ToTensor()
         
-        # I don't see the point of this but I guess it can't hurt??
+        # This part is gonna take a long time to run and honestly might break everything
+        # But I need to do the same thing in R2D2 so I guess I'm gonna figure it out now
         self.data = {}
-        for idx in range(self.imgs.shape[0]):
+        for idx in range(len(self.imgs)):
             if self.labels[idx] not in self.data:
                 self.data[self.labels[idx]] = []
-            self.data[self.labels[idx]].append(self.imgs[idx])
+            with open(self.data_root + 'patch_' + str(self.data[idx]) + '.pickle','rb') as f:
+                self.data[self.labels[idx]].append(pickle.load(f))
         self.classes = list(self.data.keys())
 
     def __getitem__(self, item):
