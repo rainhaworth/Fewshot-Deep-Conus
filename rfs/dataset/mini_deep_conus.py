@@ -7,6 +7,8 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 from torchvision import ops
 
+from tqdm import tqdm
+
 # Need to like, register this somewhere
 
 class DeepConus(Dataset):
@@ -96,16 +98,16 @@ class MetaDeepConus(DeepConus):
         self.n_test_runs = args.n_test_runs
         self.n_aug_support_samples = args.n_aug_support_samples
         
-        self.train_transform = transforms.ToTensor()
-        self.test_transform = transforms.ToTensor()
+        self.train_transform = transforms.Compose([transforms.ToTensor(), ops.Permute([1,2,0]), self.normalize])
+        self.test_transform = transforms.Compose([transforms.ToTensor(), ops.Permute([1,2,0]), self.normalize])
         
         # This part is gonna take a long time to run and honestly might break everything
         # But I need to do the same thing in R2D2 so I guess I'm gonna figure it out now
         self.data = {}
-        for idx in range(len(self.imgs)):
+        for idx in tqdm(range(len(self.imgs)), desc='Loading sample cache'):
             if self.labels[idx] not in self.data:
                 self.data[self.labels[idx]] = []
-            with open(self.data_root + 'patch_' + str(self.data[idx]) + '.pickle','rb') as f:
+            with open(self.data_root + 'patch_' + str(self.imgs[idx]) + '.pickle','rb') as f:
                 self.data[self.labels[idx]].append(pickle.load(f))
         self.classes = list(self.data.keys())
 
