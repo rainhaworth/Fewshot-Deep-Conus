@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
+from torchvision import ops
 
 # Need to like, register this somewhere
 
@@ -21,36 +22,33 @@ class DeepConus(Dataset):
         self.normalize = transforms.Normalize(mean=self.mean, std=self.std)
         self.pretrain = pretrain
         
-        self.transform = transforms.Compose([transforms.ToTensor(), self.normalize])
+        # NOTE: the permute shouldn't be necessary but ToTensor() expects HxWxC and i had CxHxW
+        # so i chose to use this instead of running decompose.py again
+        self.transform = transforms.Compose([transforms.ToTensor(), ops.Permute([1,2,0]), self.normalize])
 
         # Notes on args:
             # We probably have to keep is_sample = false, which means --n_aug_support_samples 0 for meta learning
 
-        timestamp = '1668196919.8680186'
+        timestamp = '1668967699.7431824'
         
-        datafile = self.data_root
-        labelfile = self.data_root
+        splitfile = self.data_root
         
         if partition == 'train':
-            datafile += 'src_data_' + timestamp + '.pickle'
-            labelfile += 'src_labels_' + timestamp + '.csv'
-            
+            splitfile += 'src_split_' + timestamp + '.pickle'
         elif partition == 'test':
-            datafile += 'tgt_data_' + timestamp + '.pickle'
-            labelfile += 'tgt_labels_' + timestamp + '.csv'
-            
+            splitfile += 'tgt_split_' + timestamp + '.pickle'
         elif partition == 'val':
-            datafile += 'val_data_' + timestamp + '.pickle'
-            labelfile += 'val_labels_' + timestamp + '.csv'
+            splitfile += 'val_split_' + timestamp + '.pickle'
             
         else:
             print("Partition options: train, test, val")
             return -1
         
         # Store list of labels + number of classes contained within it
-        with open(labelfile, 'rb') as f:
-            self.labels = np.loadtxt(f, delimiter=',')
-        self.labels = self.labels.astype(np.int64) # Convert to long
+        with open(splitfile, 'rb') as f:
+            _dict = pickle.load(f)
+            self.labels = list(_dict.values())
+            self.data = list(_dict.keys())
         
         self.n_classes = len(set(self.labels))
         
@@ -59,6 +57,7 @@ class DeepConus(Dataset):
         self.labels = [label_lst.index(label) for label in self.labels]
 
         # Unpickle data, store in self.data + self.imgs
+        """
         self.data = None
         with open(datafile, 'rb') as f:
             _arr = []
@@ -72,17 +71,20 @@ class DeepConus(Dataset):
                         self.data = _arr
                     else:
                         self.data = np.concatenate((self.data, _arr), axis=0)
+        """
         self.imgs = self.data
 
     def __getitem__(self, item):
-        # For some reason we need to return the index they passed in
-        return self.transform(self.data[item]), self.labels[item], item
+        with open(self.data_root + 'patch_' + str(self.data[item]) + '.pickle','rb') as f:
+            # For some reason we need to return the index they passed in
+            return self.transform(pickle.load(f)), self.labels[item], item
         
     def __len__(self):
         return len(self.labels)
 
 # This is only used for testing
 # I guess it's basically just a fewshot episode generator
+# TODO: fix this, i probably broke it somehow
 class MetaDeepConus(DeepConus):
     
     def __init__(self, args, partition='train', train_transform=None, test_transform=None, fix_seed=True):
