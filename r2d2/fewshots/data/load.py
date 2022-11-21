@@ -13,6 +13,8 @@ from fewshots.data.SetupEpisode import SetupEpisode
 
 from fewshots.data.mini_deep_conus import MiniDeepConus
 
+from tqdm import tqdm
+
 root_dir = ''
 
 # load_setup_images but for deep conus
@@ -88,7 +90,7 @@ def load_data(opt, splits):
         # populate Cache
         cache.data.update({0: []})
         _loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False)
-        for sample in _loader:
+        for sample in tqdm(_loader, desc='Loading ' + split + ' sample cache'):
             if sample[1].item() not in cache.data.keys():
                 cache.data.update({sample[1].item(): []})
             cache.data[sample[1].item()].append(sample[0])
@@ -98,7 +100,7 @@ def load_data(opt, splits):
         batch_sz = min([len(cache.data[i]) for i in cache.data.keys()])
 
         # set max batch size
-        batch_sz = min(200, batch_sz)
+        #batch_sz = min(200, batch_sz)
 
         # set transforms
         transforms = [#partial(convert_dict, 'class'),
