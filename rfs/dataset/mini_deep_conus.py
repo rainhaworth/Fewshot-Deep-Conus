@@ -84,7 +84,6 @@ class DeepConus(Dataset):
 
 # This is only used for testing
 # I guess it's basically just a fewshot episode generator
-# TODO: fix this, i probably broke it somehow
 class MetaDeepConus(DeepConus):
     
     def __init__(self, args, partition='train', train_transform=None, test_transform=None, fix_seed=True):
@@ -96,31 +95,6 @@ class MetaDeepConus(DeepConus):
         #self.classes = list(self.data.keys()) # This breaks things so I'm commenting it out
         self.n_test_runs = args.n_test_runs
         self.n_aug_support_samples = args.n_aug_support_samples
-        
-        # Comment out data augmentation
-        """
-        if train_transform is None:
-            self.train_transform = transforms.Compose([
-                    lambda x: Image.fromarray(x),
-                    transforms.RandomCrop(84, padding=8),
-                    transforms.ColorJitter(brightness=0.4, contrast=0.4, saturation=0.4),
-                    transforms.RandomHorizontalFlip(),
-                    lambda x: np.asarray(x),
-                    transforms.ToTensor(),
-                    self.normalize
-                ])
-        else:
-            self.train_transform = train_transform
-
-        if test_transform is None:
-            self.test_transform = transforms.Compose([
-                    lambda x: Image.fromarray(x),
-                    transforms.ToTensor(),
-                    self.normalize
-                ])
-        else:
-            self.test_transform = test_transform
-        """
         
         self.train_transform = transforms.ToTensor()
         self.test_transform = transforms.ToTensor()
@@ -146,7 +120,8 @@ class MetaDeepConus(DeepConus):
         query_xs = []
         query_ys = []
         for idx, cls in enumerate(cls_sampled):
-            imgs = np.asarray(self.data[cls]).astype('uint8')
+            # Wait I just realized this was converting to uint8?? Let's use float32 ty
+            imgs = np.asarray(self.data[cls]).astype('float32')
             support_xs_ids_sampled = np.random.choice(range(imgs.shape[0]), self.n_shots, False)
             support_xs.append(imgs[support_xs_ids_sampled])
             support_ys.append([idx] * self.n_shots)
