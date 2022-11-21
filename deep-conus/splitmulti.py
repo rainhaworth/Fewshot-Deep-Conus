@@ -223,6 +223,10 @@ def split_data_val_multi(datasrc='./data/', filestr='spatial_storm_data_part', o
                 val_idx.append(i)
                 val_labels.append(uh_class[i])
         
+        print('Train samples:', len(src_idx))
+        print('Val samples:', len(val_idx))
+        print('Test samples:', len(tgt_idx))
+
         # For some reason, this converts the uh_cls column from int32 to float64
         source_task = ds.isel(patch=src_idx)
         val_task = ds.isel(patch=val_idx)
