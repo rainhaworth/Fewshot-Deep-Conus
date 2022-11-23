@@ -51,7 +51,8 @@ class LRD2(nn.Module):
                 wb = self.ir_logistic(zs, w0, y_inner_binary)
                 y_hat = mm(zq, wb)
                 # y_hat = self.adjust(out)
-                scores[:, i] = y_hat
+                # Changed y_hat -> y_hat[0]
+                scores[:, i] = y_hat[0]
                 # re-generate base-learner label by circ-shift of n_shot steps
                 y_inner_binary = roll(y_inner_binary, n_shot)
 
@@ -62,8 +63,9 @@ class LRD2(nn.Module):
             acc_val = torch.eq(ind_prediction, ind_gt).float().mean()
             # print('Loss: %.3f Acc: %.3f' % (loss_val.data[0], acc_val.data[0]))
             return loss_val, {
-                'loss': loss_val.data[0],
-                'acc': acc_val.data[0]
+                # Changed .data[0] -> .item()
+                'loss': loss_val.item(),
+                'acc': acc_val.item()
             }
 
         else:
@@ -84,8 +86,9 @@ class LRD2(nn.Module):
             acc_val = torch.eq(ind_prediction, y_outer).float().mean()
             # print('Loss: %.3f Acc: %.3f' % (loss_val.data[0], acc_val.data[0]))
             return loss_val, {
-                'loss': loss_val.data[0],
-                'acc': acc_val.data[0]
+                # .data[0] -> .item()
+                'loss': loss_val.item(),
+                'acc': acc_val.item()
             }
 
     def encode(self, X, n_way, n_shot):
@@ -123,7 +126,7 @@ class LRD2(nn.Module):
             else:
                 A = mm(X, t(X, 0, 1)) + self.lambda_(inv(S))
                 #w_, _ = gesv(z_, A)
-                w = torch.linalg.solve(A, z_)
+                w_ = torch.linalg.solve(A, z_)
                 w = mm(t(X, 0, 1), w_)
 
         return w

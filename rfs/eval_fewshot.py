@@ -175,7 +175,7 @@ def main():
         model = model.cuda()
         cudnn.benchmark = True
 
-    # evalation
+    # evaluation
     start = time.time()
     val_acc, val_std = meta_test(model, meta_valloader)
     val_time = time.time() - start

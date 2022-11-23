@@ -29,17 +29,7 @@ from util import adjust_learning_rate, accuracy, AverageMeter
 from eval.meta_eval import meta_test
 from eval.cls_eval import validate
 
-
-# TODO:
-    # Import my custom dataset, should require minimal modification from the thing
-    # Change the shit that's hardcoded for their 4 datasets
-    # Debug
-
-# Trying to figure this file out
-    # Does data_root even do anything?? we can't import datasets rn so what's even the point?
-    # Oh I guess it gets used in like mini_imagenet.py
-    # Okay I guess I need to make mini_deep_conus.py again but with this complicated ass args object
-    # Set the args when you run the command
+from tqdm import tqdm
 
 def parse_option():
 
@@ -336,7 +326,8 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
     top5 = AverageMeter()
 
     end = time.time()
-    for idx, (input, target, _) in enumerate(train_loader):
+    # Added tqdm, removed print
+    for idx, (input, target, _) in tqdm(enumerate(train_loader), desc="Training epoch " + str(epoch)):
         data_time.update(time.time() - end)
 
         input = input.float()
@@ -366,19 +357,21 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
         pass
 
         # print info
-        if idx % opt.print_freq == 0:
-            print('Epoch: [{0}][{1}/{2}]\t'
+        # Only print at the end instead of every opt.printinfo
+        if idx == len(train_loader) - 1:
+            print(#'Epoch: [{0}][{1}/{2}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
                   'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
                   'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
                   'Acc@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                   epoch, idx, len(train_loader), batch_time=batch_time,
+                   #epoch, idx, len(train_loader),
+                   batch_time=batch_time,
                    data_time=data_time, loss=losses, top1=top1, top5=top5))
             sys.stdout.flush()
 
-    print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
-          .format(top1=top1, top5=top5))
+    #print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
+    #      .format(top1=top1, top5=top5))
 
     return top1.avg, losses.avg
 

@@ -107,6 +107,10 @@ def split_data_val_decomp(datasrc='./data/', filestr='uh25max', outdir='./data',
             elif uh_class[i] in target_cls:
                 tgt_dict.update({i: uh_class[i]})
         
+        print('Train samples:', len(src_dict))
+        print('Val samples:', len(val_dict))
+        print('Test samples:', len(tgt_dict))
+        
         # Write serialized dictionaries to disk
         with open(outdir + "src_split_" + timestamp + '.pickle','wb') as f:
             pickle.dump(src_dict, f)
