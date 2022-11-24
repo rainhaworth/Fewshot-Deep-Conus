@@ -52,7 +52,7 @@ class LRD2(nn.Module):
                 y_hat = mm(zq, wb)
                 # y_hat = self.adjust(out)
                 # Changed y_hat -> y_hat[0]
-                scores[:, i] = y_hat[0]
+                scores[:, i] = y_hat.squeeze()
                 # re-generate base-learner label by circ-shift of n_shot steps
                 y_inner_binary = roll(y_inner_binary, n_shot)
 
