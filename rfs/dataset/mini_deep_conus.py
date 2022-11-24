@@ -31,7 +31,7 @@ class DeepConus(Dataset):
         # Notes on args:
             # We probably have to keep is_sample = false, which means --n_aug_support_samples 0 for meta learning
 
-        timestamp = '1668967699.7431824'
+        timestamp = '1669064393.6722744'
         
         splitfile = self.data_root
         

@@ -13,7 +13,7 @@ class MiniDeepConus(Dataset):
     
     def __init__(self, root_path, split='train', **kwargs):
         # TODO: make this a parameter
-        timestamp = '1668967699.7431824'
+        timestamp = '1669064393.6722744'
 
         splitfile = root_path
         self.root_path = root_path
