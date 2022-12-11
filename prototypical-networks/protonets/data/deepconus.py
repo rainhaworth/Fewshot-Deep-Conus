@@ -27,6 +27,7 @@ DEEPCONUS_CACHE = { }
 timestamp = "1669064393.6722744"
 
 # CUSTOM FUNCTIONS: load_sample_path() and load_class_samples()
+# TODO: add normalization?
 
 def load_sample_path(key, out_field, d):
     # Open pickle file, assuming d[key] contains the correct filename
@@ -35,14 +36,19 @@ def load_sample_path(key, out_field, d):
     return d
 
 def convert_tensor(key, d):
-    # this might need to be different?? hoping it works for now
-    d[key] = 1.0 - torch.from_numpy(np.array(d[key], np.float32, copy=False)).transpose(0, 1).contiguous().view(1, d[key].size[0], d[key].size[1])
+    # Old implementation that I don't understand:
+    #d[key] = 1.0 - torch.from_numpy(np.array(d[key], np.float32, copy=False)).transpose(0, 1).contiguous().view(1, d[key].shape[0], d[key].shape[1])
+    d[key] = torch.from_numpy(d[key])
     return d
 
-def load_class_samples(ids, d):
+def load_class_samples(classes, ids, d):
     if d['class'] not in DEEPCONUS_CACHE:
         # Instead of parsing filename and grabbing all pngs in directory, grab from list of patches
-        class_samples = sorted([os.path.join(DEEPCONUS_DATA_DIR, 'patch_' + i + '.pickle') for i in ids])
+        _samples = []
+        for i in range(len(ids)):
+            if classes[i] == d['class']:
+                _samples.append(ids[i])
+        class_samples = sorted([os.path.join(DEEPCONUS_DATA_DIR, 'patch_' + str(i) + '.pickle') for i in _samples])
         if len(class_samples) == 0:
             raise Exception("No samples found for deep conus class {} at {}.".format(d['class'], DEEPCONUS_DATA_DIR))
 
@@ -50,8 +56,6 @@ def load_class_samples(ids, d):
         image_ds = TransformDataset(ListDataset(class_samples),
                                     compose([partial(convert_dict, 'file_name'),
                                              partial(load_sample_path, 'file_name', 'data'),
-                                             #partial(rotate_image, 'data', float(rot[3:])),
-                                             #partial(scale_image, 'data', 28, 28),
                                              partial(convert_tensor, 'data')]))
 
         loader = torch.utils.data.DataLoader(image_ds, batch_size=len(image_ds), shuffle=False)
@@ -126,9 +130,9 @@ def load(opt, splits):
             class_names = list(_dict.values())
             class_ids = list(_dict.keys())
 
-        # Need to define transforms here so we can pass in class_ids
+        # Need to define transforms here so we can pass in the (disassembled) dictionary
         transforms = [partial(convert_dict, 'class'),
-                      partial(load_class_samples, class_ids),
+                      partial(load_class_samples, class_names, class_ids),
                       partial(extract_episode, n_support, n_query)]
         if opt['data.cuda']:
             transforms.append(CudaTransform())
