@@ -1,15 +1,15 @@
-train_dataset: mini-deep-conus
+train_dataset: deep-conus
 train_dataset_args: {split: train, root_path: ../deep-conus/data/}
-tval_dataset: mini-deep-conus
+tval_dataset: deep-conus
 tval_dataset_args: {split: test, root_path: ../deep-conus/data/}
-val_dataset: mini-deep-conus
+val_dataset: deep-conus
 val_dataset_args: {split: val, root_path: ../deep-conus/data/}
 
 model: meta-baseline
 model_args: 
     encoder: resnet12
     encoder_args: {}
-load_encoder: ./save/classifier_mini-deep-conus_resnet12/epoch-last.pth
+load_encoder: ./save/classifier_deep-conus_resnet12/epoch-last.pth
 
 n_way: 5
 n_shot: 1
