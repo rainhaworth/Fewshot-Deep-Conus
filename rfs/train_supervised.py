@@ -356,22 +356,9 @@ def train(epoch, train_loader, model, criterion, optimizer, opt):
         # tensorboard logger
         pass
 
-        # print info
-        # Only print at the end instead of every opt.printinfo
-        if idx == len(train_loader):
-            print(#'Epoch: [{0}][{1}/{2}]\t'
-                  'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
-                  'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
-                  'Loss {loss.val:.4f} ({loss.avg:.4f})\t'
-                  'Acc@1 {top1.val:.3f} ({top1.avg:.3f})\t'
-                  'Acc@5 {top5.val:.3f} ({top5.avg:.3f})'.format(
-                   #epoch, idx, len(train_loader),
-                   batch_time=batch_time,
-                   data_time=data_time, loss=losses, top1=top1, top5=top5))
-            sys.stdout.flush()
-
-    print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
-          .format(top1=top1, top5=top5))
+    # Removed printouts in loop, added avg loss
+    print(' * Loss {loss.avg:.3f} Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
+          .format(loss=losses, top1=top1, top5=top5))
 
     return top1.avg, losses.avg
 
