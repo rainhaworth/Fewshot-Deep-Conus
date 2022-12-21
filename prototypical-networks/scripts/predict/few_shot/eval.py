@@ -6,6 +6,10 @@ from tqdm import tqdm
 import torch
 import torchnet as tnt
 
+# Same fix from train.py
+import sys
+sys.path.insert(1, '.')
+
 from protonets.utils import filter_opt, merge_dict
 import protonets.utils.data as data_utils
 import protonets.utils.model as model_utils

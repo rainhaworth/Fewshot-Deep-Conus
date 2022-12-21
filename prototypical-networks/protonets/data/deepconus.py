@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image
 
 import torch
-from torchvision.transforms import ToTensor
+from torchvision.transforms import ToTensor, Normalize
 
 from torchnet.dataset import ListDataset, TransformDataset
 from torchnet.transform import compose
@@ -35,19 +35,29 @@ def load_sample_path(key, out_field, d):
         d[out_field] = pickle.load(f)
     return d
 
+
+norm_params = {'mean': [280.8821716308594, 271.5213928222656, 260.1457214355469, 246.7049102783203, 8.42071533203125, 13.114259719848633, 16.928213119506836, 19.719449996948242, 6.177618026733398, 13.898662567138672, 18.913000106811523, 23.985916137695312, 0.007207642309367657, 0.0046530915424227715, 0.002190731931477785, 0.0007718075066804886, 868.15625, 678.8226928710938, 525.4044799804688, 401.36004638671875, 0.40490102767944336, 23.232492446899414, 8.562521934509277],
+                       'std': [109.22666931152344, 109.22666931152344, 77.23491668701172, 109.22666931152344, 8.866754531860352, 9.56382942199707, 10.957494735717773, 11.892759323120117, 8.308595657348633, 9.732820510864258, 11.696307182312012, 14.249922752380371, 0.004077681340277195, 0.0025500282645225525, 0.0013640702236443758, 0.0005331166321411729, 309.60260009765625, 308.9396667480469, 195.89791870117188, 154.46983337402344, 0.48534637689590454, 15.682641983032227, 6.017237186431885]}
+normalize = Normalize(**norm_params)
+
 def convert_tensor(key, d):
     # Old implementation that I don't understand:
     #d[key] = 1.0 - torch.from_numpy(np.array(d[key], np.float32, copy=False)).transpose(0, 1).contiguous().view(1, d[key].shape[0], d[key].shape[1])
     d[key] = torch.from_numpy(d[key])
+    # add normalization
+    d[key] = normalize.forward(d[key])
     return d
 
 def load_class_samples(classes, ids, d):
     if d['class'] not in DEEPCONUS_CACHE:
         # Instead of parsing filename and grabbing all pngs in directory, grab from list of patches
         _samples = []
+        # set hard limit so i can make this run faster
+        limit = 1000
         for i in range(len(ids)):
-            if classes[i] == d['class']:
+            if classes[i] == d['class'] and len(_samples) < limit:
                 _samples.append(ids[i])
+        print("Loading class", d['class'], "with", len(_samples), "samples")
         class_samples = sorted([os.path.join(DEEPCONUS_DATA_DIR, 'patch_' + str(i) + '.pickle') for i in _samples])
         if len(class_samples) == 0:
             raise Exception("No samples found for deep conus class {} at {}.".format(d['class'], DEEPCONUS_DATA_DIR))
