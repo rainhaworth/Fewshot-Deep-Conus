@@ -11,7 +11,7 @@ from fewshots.data.cache import Cache
 from fewshots.utils import filter_opt
 from fewshots.data.SetupEpisode import SetupEpisode
 
-from fewshots.data.mini_deep_conus import MiniDeepConus
+from fewshots.data.deep_conus import DeepConus
 
 from tqdm import tqdm
 
@@ -85,13 +85,13 @@ def load_data(opt, splits):
         if split in ['val1','val5']:
             splitname = 'val'
         
-        ds = MiniDeepConus(root_dir + '/', split=splitname)
+        ds = DeepConus(root_dir + '/', split=splitname)
 
         # populate Cache
-        cache.data.update({0: []})
         _loader = torch.utils.data.DataLoader(ds, batch_size=1, shuffle=False)
         for sample in tqdm(_loader, desc='Loading ' + split + ' sample cache'):
             if sample[1].item() not in cache.data.keys():
+                # TODO: sanity check this
                 cache.data.update({sample[1].item(): []})
             cache.data[sample[1].item()].append(sample[0])
 

@@ -53,8 +53,8 @@ def _data_model_setup(opts):
         else:
             raise ValueError('Unknown model name')
             
-    elif opts['data.dataset'] == 'minideepconus':
-        # Mini Deep Conus implementation
+    elif opts['data.dataset'] == 'deepconus':
+        # Deep Conus implementation
         # Started w/ copy-pasted miniimagenet
         opts['data.split'] = 'ravi-larochelle' # I guess this is just the split name, I don't use it
         opts['model.x_dim'] = '23,32,32' # Changed dims
@@ -138,9 +138,9 @@ def main(opts):
         for split, split_meters in meters.items():
             for field, meter in split_meters.items():
                 meter.reset()
-        if opts['train.scheduler_type'] == 'step':
-            state['optimizer'].step() # Added to make PyTorch happy
-            state['scheduler'].step()
+        #if opts['train.scheduler_type'] == 'step':
+        #    state['optimizer'].step() # Added to make PyTorch happy
+        #    state['scheduler'].step()
 
     engine.hooks['on_start_epoch'] = on_start_epoch
 
@@ -183,8 +183,8 @@ def main(opts):
             f.write('\n')
 
         if val1_loader is not None:
-            if opts['train.scheduler_type'] == 'plateau':
-                state['scheduler'].step(meter_vals['val1']['acc'])
+            #if opts['train.scheduler_type'] == 'plateau':
+            #    state['scheduler'].step(meter_vals['val1']['acc'])
             if meter_vals['val1']['acc'] >= hook_state['best_acc1']:
                 hook_state['best_acc1'] = meter_vals['val1']['acc']
                 logger("==> SAVING MODEL FOR 1SHOT")
@@ -205,8 +205,8 @@ def main(opts):
                 state['model'].cuda()
 
         if val5_loader is not None:
-            if opts['train.scheduler_type'] == 'plateau':
-                state['scheduler'].step(meter_vals['val5']['acc'])
+            #if opts['train.scheduler_type'] == 'plateau':
+            #    state['scheduler'].step(meter_vals['val5']['acc'])
             if meter_vals['val5']['acc'] >= hook_state['best_acc5']:
                 hook_state['best_acc5'] = meter_vals['val5']['acc']
                 logger("==> SAVING MODEL FOR 5SHOT")

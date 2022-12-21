@@ -7,7 +7,7 @@ parser = configargparse.ArgumentParser(default_config_files=['conf/fewshots.yaml
                                        description='Train network for few-shot learning')
 
 # # Data
-parser.add('--data.dataset', type=str, metavar='{omniglot,imagenet,cifar100}', help="data set name")
+parser.add('--data.dataset', type=str, metavar='{omniglot,imagenet,cifar100,deepconus}', help="data set name")
 parser.add('--data.root_dir', type=str, metavar='PATH', help="path to root data folder")
 parser.add('--data.way', type=int, metavar='N', help="classes per episode, 0 for random")
 parser.add('--data.shot', type=int, metavar='N', help="examples, 0 for random")

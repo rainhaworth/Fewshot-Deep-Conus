@@ -11,7 +11,7 @@ from torchvision import ops
 
 # Imported from few-shot-meta-baseline
 
-class MiniDeepConus(Dataset):
+class DeepConus(Dataset):
     
     def __init__(self, root_path, split='train', **kwargs):
         # TODO: make this a parameter
