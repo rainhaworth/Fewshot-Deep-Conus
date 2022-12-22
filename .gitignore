@@ -5,3 +5,4 @@
 /rfs/models_pretrained
 /rfs/tensorboard
 **/results
+*.csv
