@@ -12,7 +12,7 @@ def decompose_nc(datasrc='./data/', filestr='spatial_storm_data_part', outdir='.
 
     # Track patch index across files
     filenum = start
-    idx = (1-start) * 90000 # NOTE: This assumes every file up to start has exactly 90k patches
+    idx = (start-1) * 90000 # NOTE: This assumes every file up to start has exactly 90k patches
 
     # Populate array with max uh25 values
     uh25_max_arr = []
@@ -20,7 +20,7 @@ def decompose_nc(datasrc='./data/', filestr='spatial_storm_data_part', outdir='.
     # If we have stored some values already, retrieve them
     if os.path.isfile(outdir + 'uh25max.csv'):
         with open(outdir + 'uh25max.csv','rb') as f:
-            uh25_max_arr = np.loadtxt(f, uh25_max_arr, delimiter=',')
+            uh25_max_arr = list(np.loadtxt(f, delimiter=','))
 
     # Traverse all files
     while os.path.isfile(datasrc + filestr + str(filenum) + '.nc'):

@@ -4,4 +4,4 @@ from . import tiered_imagenet
 from . import image_folder
 from . import samplers
 # New files here:
-from . import mini_deep_conus
+from . import deep_conus

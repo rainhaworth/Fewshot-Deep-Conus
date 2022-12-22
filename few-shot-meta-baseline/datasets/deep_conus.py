@@ -8,8 +8,8 @@ from torchvision import transforms, ops
 
 from .datasets import register
 
-@register('mini-deep-conus')
-class MiniDeepConus(Dataset):
+@register('deep-conus')
+class DeepConus(Dataset):
     
     def __init__(self, root_path, split='train', **kwargs):
         # TODO: make this a parameter
@@ -42,22 +42,6 @@ class MiniDeepConus(Dataset):
         label_lst = list(set(self.label))
         self.label = [label_lst.index(label) for label in self.label]
         
-        # Unpickle data, store in self.data
-        """
-        self.data = None
-        with open(datafile, 'rb') as f:
-            _arr = []
-            while True:
-                try:
-                    _arr = pickle.load(f)
-                except EOFError:
-                    break
-                else:
-                    if self.data is None:
-                        self.data = _arr
-                    else:
-                        self.data = np.concatenate((self.data, _arr), axis=0)
-        """
         # Transforms
         # Normalization (params generated in deep-conus-master/fewshot.ipynb)
         norm_params = {'mean': [280.8821716308594, 271.5213928222656, 260.1457214355469, 246.7049102783203, 8.42071533203125, 13.114259719848633, 16.928213119506836, 19.719449996948242, 6.177618026733398, 13.898662567138672, 18.913000106811523, 23.985916137695312, 0.007207642309367657, 0.0046530915424227715, 0.002190731931477785, 0.0007718075066804886, 868.15625, 678.8226928710938, 525.4044799804688, 401.36004638671875, 0.40490102767944336, 23.232492446899414, 8.562521934509277],
