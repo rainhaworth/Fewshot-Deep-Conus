@@ -8,7 +8,7 @@ import xarray as xr
 import argparse
 
 # Create splits on decomposed data as dictionaries of indices
-def split_data_future(datasrc, futuresrc, filestr, outdir,
+def split_data_future(datasrc, futuresrc, filestr,
                n_class, n_class_future, class_sep, domain_gap, val_sz, max_val):
     # NOTE: data where max UH exceeds max_val will still be placed in the last class
 
@@ -114,14 +114,14 @@ def split_data_future(datasrc, futuresrc, filestr, outdir,
         print('Test samples:', len(tgt_dict))
         
         # Write serialized dictionaries to disk
-        with open(outdir + "src_split_" + timestamp + '.pickle','wb') as f:
+        with open(datasrc + "src_split_" + timestamp + '.pickle','wb') as f:
             pickle.dump(src_dict, f)
-        with open(outdir + "val_split_" + timestamp + '.pickle','wb') as f:
+        with open(datasrc + "val_split_" + timestamp + '.pickle','wb') as f:
             pickle.dump(val_dict, f)
-        with open(outdir + "tgt_split_" + timestamp + '.pickle','wb') as f:
+        with open(futuresrc + "tgt_split_" + timestamp + '.pickle','wb') as f:
             pickle.dump(tgt_dict, f)
 
-        print("Dataset split with validation complete. Dictionaries stored at",  outdir)
+        print("Dataset split with validation complete. Past storms dictionary stored at", datasrc, "and future storms at ", futuresrc)
         print("Timestamp:", timestamp)
     else:
         print("Uh25max files not found. Run decompose.py on past storms and future storms, each in different directories.")
@@ -132,7 +132,6 @@ parser = argparse.ArgumentParser(description='Split dataset.')
 parser.add_argument('--datasrc',        type=str,   default='./data/',          help='set (past storm) datset source directory')
 parser.add_argument('--futuresrc',      type=str,   default='./data-future/',   help='set future storm dataset source directory')
 parser.add_argument('--filestr',        type=str,   default='uh25max',          help='set directory filename (expects $(filestr).csv)')
-parser.add_argument('--outdir',         type=str,   default='./data/',          help='directory to store output files')
 parser.add_argument('--n_class',        type=int,   default=15,                 help='number of classes to create when binning past storms')
 parser.add_argument('--n_class_future', type=int,   default=5,                 help='number of classes to create when binning')
 parser.add_argument('--max_val',        type=int,   default=75,                 help='max value used when binning classes')
@@ -143,6 +142,6 @@ parser.add_argument('--domain_gap',     type=float, default=1.0,                
 args = parser.parse_args()
 
 # Run split function
-split_data_future(datasrc=args.datasrc, futuresrc=args.futuresrc, filestr=args.filestr, outdir=args.outdir, 
+split_data_future(datasrc=args.datasrc, futuresrc=args.futuresrc, filestr=args.filestr,
                       n_class=args.n_class, n_class_future=args.n_class_future, max_val=args.max_val,
                       class_sep=args.class_sep, val_sz=args.val_sz, domain_gap=args.domain_gap)
