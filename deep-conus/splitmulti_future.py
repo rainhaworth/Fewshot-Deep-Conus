@@ -53,6 +53,7 @@ def split_data_future(datasrc, futuresrc, filestr,
 
         # Create list of classes; indices of uh_class must match patch indices
         uh_class = []
+        above_max = 0
         for val in uh25mx:
             # Actual class size = class_size * (1 - separation)
             val_class = math.floor(val / class_size)
@@ -60,7 +61,7 @@ def split_data_future(datasrc, futuresrc, filestr,
             # If calculated class exceeds number of classes, put in highest class
             if val_class >= n_class:
                 val_class = n_class - 1
-                print(val) # Print value to see how far it is above max_val
+                above_max += 1
 
             # Remove the bottom (separation*100)% of data within this class
             # Note: a consequence of this is that all very light storms are pruned
@@ -71,6 +72,7 @@ def split_data_future(datasrc, futuresrc, filestr,
                 count_class[val_class] += 1
 
         print("Past storm samples per class: ", count_class)
+        print("Samples above max:", above_max)
 
         # Populate dictionaries
         src_dict = {}
@@ -108,6 +110,7 @@ def split_data_future(datasrc, futuresrc, filestr,
             count_class[val_class] += 1
 
         print("Future storm samples per class: ", count_class)
+        print("Past max:", max(uh25mx), "| Future max:", max(uh25mx_test))
         
         print('Train samples:', len(src_dict))
         print('Val samples:', len(val_dict))
