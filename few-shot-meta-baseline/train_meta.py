@@ -34,9 +34,9 @@ def main(config):
 
     #### Dataset ####
     
-    # Another global num_workers setting
-    # Might be best to add a parameter/config for this
-    nw = 4
+    # Another global num_workers setting, should probably be a command line/config parameter
+    # Increase if you have more memory
+    nw = 1
 
     n_way, n_shot = config['n_way'], config['n_shot']
     n_query = config['n_query']

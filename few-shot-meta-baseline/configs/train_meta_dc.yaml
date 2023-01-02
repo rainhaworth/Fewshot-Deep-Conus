@@ -1,7 +1,7 @@
 train_dataset: deep-conus
 train_dataset_args: {split: train, root_path: ../deep-conus/data/}
 tval_dataset: deep-conus
-tval_dataset_args: {split: test, root_path: ../deep-conus/data/}
+tval_dataset_args: {split: test, root_path: ../deep-conus/data-future/}
 val_dataset: deep-conus
 val_dataset_args: {split: val, root_path: ../deep-conus/data/}
 
@@ -19,6 +19,6 @@ ep_per_batch: 4
 
 max_epoch: 20
 optimizer: sgd
-optimizer_args: {lr: 0.001, weight_decay: 5.e-4}
+optimizer_args: {lr: 0.0001, weight_decay: 5.e-5}
 
 visualize_datasets: False

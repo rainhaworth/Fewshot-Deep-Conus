@@ -1,5 +1,5 @@
 dataset: deep-conus
-dataset_args: {split: test, root_path: ../deep-conus/data/}
+dataset_args: {split: test, root_path: ../deep-conus/data-future/}
 
 load: ./save/meta_deep-conus-1shot_meta-baseline-resnet12/max-va.pth
 # load_encoder: ./save/classifier_deep-conus_resnet12/epoch-last.pth

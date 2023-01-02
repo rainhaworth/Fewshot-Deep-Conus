@@ -17,26 +17,35 @@ def split_data_future(datasrc, futuresrc, filestr,
     print("Max value: {:.2f} | Class size: {:.2f} | With separation: {:.2f}"
           .format(max_val, class_size, class_size*(1-class_sep)))
 
+    # Define class function: get floor from class number
+    exp = 3
+    def class_val(n, mx, n_c):
+        return mx * ((n / n_c) ** exp)
+
+    # Get (unfloored) class number from current value
+    def class_num(val, mx, n_c):
+        return n_c * ((val / mx) ** (1/exp))
+
     # Bin classes
 
     source_cls = range(n_class)
     target_cls = range(n_class_future)
-    
+
     # Sample val_cls source_cls, then remove val_cls from source_cls
     # High gap val
     val_cls = [source_cls[i] for i in range(round(-val_sz*domain_gap*len(source_cls)),0)]
     # Low gap val
     low_val_sz = round(val_sz*len(source_cls)) - len(val_cls)
-    
+
     source_cls = [x for x in source_cls if x not in val_cls]
     for i in range(1,low_val_sz+1):
         val_cls.append(source_cls[math.ceil(i * len(source_cls)/ (low_val_sz+1.0))])
 
     # Remove all val_cls from source_cls
     source_cls = [x for x in source_cls if x not in val_cls]
-    
+
     val_cls.sort()
-    
+
     print("source_cls:", len(source_cls), source_cls)
     print("val_cls   :", len(val_cls), val_cls)
     print("target_cls:", len(target_cls), target_cls)
@@ -56,20 +65,21 @@ def split_data_future(datasrc, futuresrc, filestr,
         above_max = 0
         for val in uh25mx:
             # Actual class size = class_size * (1 - separation)
-            val_class = math.floor(val / class_size)
+            val_class = class_num(val, max_val, n_class)
 
+            c = math.floor(val_class)
             # If calculated class exceeds number of classes, put in highest class
-            if val_class >= n_class:
-                val_class = n_class - 1
+            if c >= n_class:
+                c = n_class - 1
                 above_max += 1
 
             # Remove the bottom (separation*100)% of data within this class
             # Note: a consequence of this is that all very light storms are pruned
-            if val - (class_size * val_class) < class_size * class_sep:
+            if class_val(val_class, max_val, n_class) < class_val(c + class_sep, max_val, n_class):
                 uh_class.append(-1)
             else:
-                uh_class.append(val_class)
-                count_class[val_class] += 1
+                uh_class.append(c)
+                count_class[c] += 1
 
         print("Past storm samples per class: ", count_class)
         print("Samples above max:", above_max)
@@ -93,13 +103,13 @@ def split_data_future(datasrc, futuresrc, filestr,
         # Calculate future max and class size
         future_max = max(uh25mx_test)
         future_class_size = future_max / n_class_future
-        
+
         tgt_dict = {}
         count_class = [0] * n_class_future
         for i in range(len(uh25mx_test)):
             val = uh25mx_test[i]
             # Actual class size = class_size * (1 - separation)
-            val_class = math.floor(val / future_class_size)
+            val_class = math.floor(class_num(val, future_max, n_class_future))
 
             # If calculated class exceeds number of classes, put in highest class (this shouldn't happen)
             if val_class >= n_class_future:
@@ -111,11 +121,11 @@ def split_data_future(datasrc, futuresrc, filestr,
 
         print("Future storm samples per class: ", count_class)
         print("Past max:", max(uh25mx), "| Future max:", max(uh25mx_test))
-        
+
         print('Train samples:', len(src_dict))
         print('Val samples:', len(val_dict))
         print('Test samples:', len(tgt_dict))
-        
+
         # Write serialized dictionaries to disk
         with open(datasrc + "src_split_" + timestamp + '.pickle','wb') as f:
             pickle.dump(src_dict, f)
