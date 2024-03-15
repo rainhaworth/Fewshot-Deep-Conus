@@ -1,13 +1,15 @@
 # Fewshot-Deep-Conus
 Recent few-shot learning methods adapted for atmospheric spatial data contained in the Deep Conus dataset. Repositories used:
 
-https://github.com/mariajmolina/deep-conus
+[Deep CONUS](https://github.com/mariajmolina/deep-conus)
 
-https://github.com/yinboc/few-shot-meta-baseline
+[Few-shot Meta-Baseline](https://github.com/yinboc/few-shot-meta-baseline)
 
-https://github.com/WangYueFt/rfs/
+[Representations for Few-shot Learning (RFS)](https://github.com/WangYueFt/rfs/)
 
-https://github.com/bertinetto/r2d2
+[Meta-learning with differentiable closed-form solvers (R2D2)](https://github.com/bertinetto/r2d2)
+
+[Prototypical Networks for Few-shot Learning](https://github.com/jakesnell/prototypical-networks)
 
 # Generating data
 
@@ -33,7 +35,9 @@ Evaluate 1-shot: `python test_few_shot.py --shot 1`
 
 Evaluate 5-shot: `python test_few_shot.py --shot 5`
 
-## Representations for Few-Shot Learning (RFS)
+## Previously used methods
+
+### Representations for Few-Shot Learning (RFS)
 
 Navigate to `/rfs/`. If you have enough memory or are using a cluster, set `--num_workers 8`.
 
@@ -45,7 +49,7 @@ Evaluate 1-shot: `python eval_fewshot.py --model_path ./models_distilled/S-resne
 
 Evaluate 5-shot: `python eval_fewshot.py --model_path ./models_distilled/S-resnet12_T-resnet12_miniDeepConus_kd_r-0.5_a-0.5_b-0_trans_A_born1/resnet12_last.pth --num_workers 1 --data_root ../deep-conus/data/ --dataset miniDeepConus --n_shots 5`
 
-## Meta-learning with differentiable closed-form solvers
+### Meta-learning with differentiable closed-form solvers
 
 Navigate to `/r2d2/scripts/train/`. I have included the set of parameters I have found to be most effective on Deep Conus, but feel free to experiment with other options. Note that this method requires that you have enough RAM available to store your entire training set and validation set.
 
