@@ -36,7 +36,7 @@ def main(config):
     
     # Another global num_workers setting, should probably be a command line/config parameter
     # Increase if you have more memory
-    nw = 1
+    nw = 16
 
     n_way, n_shot = config['n_way'], config['n_shot']
     n_query = config['n_query']

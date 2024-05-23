@@ -25,7 +25,6 @@ def split_data_future(args):
     max_val = args.max_val
     exp = args.exp
 
-
     # Calculate (past storm) class size
     class_size = max_val / n_class
     print("Max value: {:.2f} | Class size: {:.2f} | With separation: {:.2f}"
@@ -144,11 +143,11 @@ def split_data_future(args):
         print('Test samples:', len(tgt_dict))
 
         # Write serialized dictionaries to disk
-        with open(datasrc + "src_split_" + timestamp + '.pickle','wb') as f:
+        with open(os.path.join(datasrc, "src_split_" + timestamp + '.pickle'),'wb') as f:
             pickle.dump(src_dict, f)
-        with open(datasrc + "val_split_" + timestamp + '.pickle','wb') as f:
+        with open(os.path.join(datasrc, "val_split_" + timestamp + '.pickle'),'wb') as f:
             pickle.dump(val_dict, f)
-        with open(futuresrc + "tgt_split_" + timestamp + '.pickle','wb') as f:
+        with open(os.path.join(futuresrc, "tgt_split_" + timestamp + '.pickle'),'wb') as f:
             pickle.dump(tgt_dict, f)
 
         print("Dataset split with validation complete. Past storms dictionary stored at", datasrc, "and future storms at", futuresrc)

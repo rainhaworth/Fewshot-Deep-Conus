@@ -43,7 +43,7 @@ def main(config):
             dataset.label, n_batch, n_way, n_shot + n_query,
             ep_per_batch=ep_per_batch)
     loader = DataLoader(dataset, batch_sampler=batch_sampler,
-                        num_workers=4, pin_memory=True)
+                        num_workers=16, pin_memory=True)
 
     # model
     if config.get('load') is None:

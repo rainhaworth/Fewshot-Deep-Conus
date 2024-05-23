@@ -1,5 +1,5 @@
 dataset: deep-conus
-dataset_args: {split: test, root_path: ../deep-conus/data-future/}
+dataset_args: {split: test, root_path: /fs/nexus-scratch/rhaworth/deep-conus/data-future/, timestamp: 1716491090.024492}
 
 load: ./save/meta_deep-conus-1shot_meta-baseline-resnet12/max-va.pth
 # load_encoder: ./save/classifier_deep-conus_resnet12/epoch-last.pth

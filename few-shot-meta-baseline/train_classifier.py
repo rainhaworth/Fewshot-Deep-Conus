@@ -37,8 +37,7 @@ def main(config):
     #### Dataset ####
     
     # Added a global num_workers setting
-    # Increase if you have more memory
-    nw = 1
+    nw = 16
 
     # train
     train_dataset = datasets.make(config['train_dataset'],

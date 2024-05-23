@@ -15,6 +15,7 @@ class DeepConus(Dataset):
         # accepted splits: train, test, val
         # accepted features settings: full, alt
 
+        timestamp = str(timestamp)
         splitfile = root_path
         self.root_path = root_path
         
@@ -55,14 +56,12 @@ class DeepConus(Dataset):
             n_channels = 16
 
             # remove unwanted channels from norm_params
-            del norm_params['mean'][12:16]
-            del norm_params['mean'][-3:]
-            del norm_params['std'][12:16]
-            del norm_params['std'][-3:]
+            norm_params['mean'] = norm_params['mean'][:12] + norm_params['mean'][16:20]
+            norm_params['std'] = norm_params['std'][:12] + norm_params['std'][16:20]
 
             # lambda to remove the same channels from each tensor
             channels = torch.concat([torch.arange(0, 12), torch.arange(16, 20)])
-            drop_channels = transforms.Lambda(lambda x: x[..., channels])
+            drop_channels = transforms.Lambda(lambda x: x[channels, ...])
 
             normalize = transforms.Normalize(**norm_params)
             tlst = [transforms.ToTensor(), ops.Permute([1,2,0]), drop_channels, normalize]

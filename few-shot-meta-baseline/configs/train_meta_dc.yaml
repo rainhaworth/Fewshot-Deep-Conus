@@ -1,9 +1,9 @@
 train_dataset: deep-conus
-train_dataset_args: {split: train, root_path: /fs/nexus-scratch/rhaworth/deep-conus/data/, timestamp: 1716491090.024492}
+train_dataset_args: {split: train, root_path: /fs/nexus-scratch/rhaworth/deep-conus/current/, timestamp: 1716492963.5225127}
 tval_dataset: deep-conus
-tval_dataset_args: {split: test, root_path: /fs/nexus-scratch/rhaworth/deep-conus/data-future/, timestamp: 1716491090.024492}
+tval_dataset_args: {split: test, root_path: /fs/nexus-scratch/rhaworth/deep-conus/future/, timestamp: 1716492963.5225127}
 val_dataset: deep-conus
-val_dataset_args: {split: val, root_path: /fs/nexus-scratch/rhaworth/deep-conus/data/, timestamp: 1716491090.024492}
+val_dataset_args: {split: val, root_path: /fs/nexus-scratch/rhaworth/deep-conus/current/, timestamp: 1716492963.5225127}
 
 model: meta-baseline
 model_args: 

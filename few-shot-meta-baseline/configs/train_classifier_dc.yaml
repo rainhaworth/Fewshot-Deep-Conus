@@ -1,7 +1,7 @@
 train_dataset: deep-conus
-train_dataset_args: {split: train, root_path: /fs/nexus-scratch/rhaworth/deep-conus/data/, timestamp: 1716491090.024492}
+train_dataset_args: {split: train, root_path: /fs/nexus-scratch/rhaworth/deep-conus/current/, timestamp: 1716492963.5225127}
 fs_dataset: deep-conus
-fs_dataset_args: {split: test, root_path: /fs/nexus-scratch/rhaworth/deep-conus/data-future/, timestamp: 1716491090.024492}
+fs_dataset_args: {split: test, root_path: /fs/nexus-scratch/rhaworth/deep-conus/future/, timestamp: 1716492963.5225127}
 eval_fs_epoch: 5
 
 model: classifier
