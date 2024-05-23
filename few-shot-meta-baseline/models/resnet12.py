@@ -3,6 +3,10 @@ import torch.nn as nn
 from .models import register
 
 
+# set global number of channels; better approaches are more annoying
+N_CHANNEL = 16
+
+
 def conv3x3(in_planes, out_planes):
     return nn.Conv2d(in_planes, out_planes, 3, padding=1, bias=False)
 
@@ -60,7 +64,7 @@ class ResNet12(nn.Module):
     def __init__(self, channels):
         super().__init__()
 
-        self.inplanes = 23 #3 -> 23, this seems to make everything work fine with 23 channels
+        self.inplanes = N_CHANNEL
 
         self.layer1 = self._make_layer(channels[0])
         self.layer2 = self._make_layer(channels[1])
